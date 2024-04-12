@@ -19,6 +19,7 @@ submenu_eps
 """
 
 import datetime
+import Avance
 
 def generar_codigo(eps, count):
     return f'EPS-{eps}-{count}'
