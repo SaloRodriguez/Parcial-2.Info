@@ -1,0 +1,126 @@
+""""El algoritmo debe: Almacenar datos de pacientes en un diccionario, 
+generar un cÃ³digo dependiendo de su afiliaciÃ³n, 
+proporcionar un menÃº para gestionar los pacientes y sus resultados, 
+validar la entrada de datos, asegurÃ¡ndose de que los valores numÃ©ricos sean correctos y manejar las excepciones, 
+imprimir informes relacionados con afiliaciÃ³n de pacientes y estadÃ­sticas
+
+Estructura
+Funciones auxiliares
+MenÃº principal con opciones para manejar pacientes.
+SubmenÃº de EPS con opciones de bÃºsqueda y reporte.
+Diccionario para la informaciÃ³n de los pacientes.
+
+Funciones
+generar_codigo
+validar_numero
+validar_fecha
+menu_principal
+submenu_eps
+"""
+
+import datetime
+
+def generar_codigo(eps, count):
+    return f'EPS-{eps}-{count}'
+
+def validar_numero(mensaje):
+    intentos = 3
+    while intentos > 0:
+        try:
+            valor = float(input(mensaje))
+            return valor
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+            intentos -= 1
+    return None
+
+def validar_fecha(mensaje):
+    while True:
+        fecha_str = input(mensaje)
+        try:
+            fecha = datetime.datetime.strptime(fecha_str, "%Y-%m-%d").date()
+            if fecha <= datetime.date.today():
+                return fecha
+            else:
+                print("Ingrese una fecha válida.")
+        except ValueError:
+            print("Formato incorrecto. Use YYYY-MM-DD.")
+
+def menu_principal():
+    pacientes = {}
+    count = 1
+    while True:
+        print("\nMenú Principal:")
+        print("1) Ingresar un paciente")
+        print("2) Informe de afiliación EPS")
+        print("3) Borrar paciente")
+        print("4) Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == '1':
+            nombre = input("Ingrese el nombre del paciente: ")
+            doc_identidad = input("Ingrese el documento de identidad: ")
+            fecha_naci = validar_fecha("Ingrese la fecha de nacimiento (YYYY-MM-DD): ")
+            edad = input("Ingrese la edad del paciente: ")
+            eps = input("Ingrese la EPS (SISBEN, Sura, Coomeva, Medimas, IPS Universitaria, Salud Total): ")
+            lh = validar_numero("Ingrese el nivel de LH: ")
+            
+            # Diagnóstico de LH y edad
+            if edad < "18":
+                diagnostico = "Normal" if 0 <= lh <= 5 else "Anormal"
+            elif edad > "18":
+                diagnostico = "Normal" if 5 <= lh <= 25 else "Anormal"
+            else:
+                diagnostico = "Normal" if 14.2 <= lh <= 52.3 else "Anormal"
+            
+            codigo = generar_codigo(eps, count)
+            pacientes[doc_identidad] = [nombre, codigo, fecha_naci, edad, (lh, diagnostico)]
+            count += 1
+            print(f"Paciente {nombre} identificado con cédula {doc_identidad} ingresado exitosamente, su resultado es {diagnostico}")
+
+        elif opcion == '2':
+            submenu_eps(pacientes)
+        elif opcion == '3':
+            doc_borrar = input("Ingrese el documento del paciente a borrar: ")
+            if doc_borrar in pacientes:
+                del pacientes[doc_borrar]
+                print("Paciente borrado exitosamente.")
+            else:
+                print("Paciente no encontrado.")
+        elif opcion == '4':
+            break
+        else:
+            print("Opción no válida.")
+
+def submenu_eps(pacientes):
+    while True:
+        print("\nSubmenú EPS:")
+        print("a) Buscar paciente")
+        print("b) Ver cantidad de pacientes totales")
+        print("c) Ver cantidad de pacientes menores de 10")
+        print("d) Ver cantidad de pacientes mayores de 60")
+        print("e) Volver al menú principal")
+        subopcion = input("Seleccione una opción: ")
+
+        if subopcion == 'a':
+            doc_id = input("Ingrese el documento del paciente a buscar: ")
+            if doc_id in pacientes:
+                paciente = pacientes[doc_id]
+                print(f"Nombre: {paciente[0]}, Código: {paciente[1]}, Fecha de Nacimiento: {paciente[2]}, Edad: {paciente[3]}, LH y Diagnóstico: {paciente[4]}")
+            else:
+                print(f"El paciente con el número de identificación {doc_id} no existe en la base de datos.")
+        elif subopcion == 'b':
+            print(f"Total de pacientes: {len(pacientes)}")
+        elif subopcion == 'c':
+            menores_10 = list(filter(lambda x: x[3] < "10", pacientes.values()))
+            print(f"Cantidad de pacientes menores de 10 años: {len(menores_10)}")
+        elif subopcion == 'd':
+            mayores_60 = list(filter(lambda x: x[3] > "60", pacientes.values()))
+            print(f"Cantidad de pacientes mayores de 60 años: {len(mayores_60)}")
+        elif subopcion == 'e':
+            break
+        else:
+            print("Opción no válida.")
+
+if __name__ == '__main__':
+    menu_principal()
