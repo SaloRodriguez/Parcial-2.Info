@@ -1,0 +1,31 @@
+import datetime
+
+def generar_codigo(eps, count):
+    return f'EPS-{eps}-{count}'
+
+def validar_numero(mensaje):
+    intentos = 3
+    while intentos > 0:
+        try:
+            valor = float(input(mensaje))
+            return valor
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+            intentos -= 1
+    return None
+
+def validar_fecha(mensaje):
+    while True:
+        fecha_str = input(mensaje)
+        try:
+            fecha = datetime.datetime.strptime(fecha_str, "%Y-%m-%d").date()
+            if fecha <= datetime.date.today():
+                return fecha
+            else:
+                print("Ingrese una fecha válida.")
+        except ValueError:
+            print("Formato incorrecto. Use YYYY-MM-DD.")
+
+def menu_principal():
+    pacientes = {}
+    count = 1
